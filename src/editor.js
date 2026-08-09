@@ -17,6 +17,11 @@ import {
 import { javascript } from "https://esm.sh/@codemirror/lang-javascript";
 import { html } from "https://esm.sh/@codemirror/lang-html";
 import { css } from "https://esm.sh/@codemirror/lang-css";
+import { python } from "https://esm.sh/@codemirror/lang-python";
+import { cpp } from "https://esm.sh/@codemirror/lang-cpp";
+import { rust } from "https://esm.sh/@codemirror/lang-rust";
+import { java } from "https://esm.sh/@codemirror/lang-java";
+import { php } from "https://esm.sh/@codemirror/lang-php";
 
 import { oneDark } from "https://esm.sh/@codemirror/theme-one-dark";
 
@@ -25,17 +30,54 @@ import {
   defaultHighlightStyle
 } from "https://esm.sh/@codemirror/language";
 
+import { detectLanguage } from "./languages.js";
+
 
 function languageForFile(fileName) {
-  if (fileName.endsWith(".html")) {
+  const name = fileName.toLowerCase();
+
+  if (name.endsWith(".html") || name.endsWith(".htm")) {
     return html();
   }
 
-  if (fileName.endsWith(".css")) {
+  if (name.endsWith(".css")) {
     return css();
   }
 
-  return javascript();
+  if (name.endsWith(".py") || name.endsWith(".pyw")) {
+    return python();
+  }
+
+  if (
+    name.endsWith(".c") ||
+    name.endsWith(".h") ||
+    name.endsWith(".cpp") ||
+    name.endsWith(".cc") ||
+    name.endsWith(".cxx") ||
+    name.endsWith(".hpp") ||
+    name.endsWith(".hh")
+  ) {
+    return cpp();
+  }
+
+  if (name.endsWith(".rs")) {
+    return rust();
+  }
+
+  if (name.endsWith(".java")) {
+    return java();
+  }
+
+  if (name.endsWith(".php")) {
+    return php();
+  }
+
+  // CodeMirror's JavaScript mode supports TypeScript syntax when enabled.
+  return javascript({
+    typescript:
+      name.endsWith(".ts") ||
+      name.endsWith(".tsx")
+  });
 }
 
 
@@ -51,18 +93,20 @@ export class EditorService {
 
     this.view = null;
     this.currentFile = null;
+    this.language = null;
+    this.loadingFile = false;
   }
 
 
   mount(fileName, content) {
     this.currentFile = fileName;
+    this.language = detectLanguage(fileName);
 
     const state = EditorState.create({
       doc: content,
 
       extensions: [
         lineNumbers(),
-
         history(),
 
         keymap.of([
@@ -75,42 +119,41 @@ export class EditorService {
 
         syntaxHighlighting(
           defaultHighlightStyle,
-          {
-            fallback: true
-          }
+          { fallback: true }
         ),
 
         oneDark,
-
         languageForFile(fileName),
 
-        EditorView.updateListener.of(
-          update => {
-            if (update.docChanged) {
-              this.onChange?.(
-                update.state.doc.toString()
-              );
-            }
-
-            if (update.selectionSet) {
-              this.updateCursor();
-            }
+        EditorView.updateListener.of(update => {
+          if (update.docChanged && !this.loadingFile) {
+            this.onChange?.(
+              update.state.doc.toString()
+            );
           }
-        ),
+
+          if (update.selectionSet || update.docChanged) {
+            this.updateCursor();
+          }
+        }),
 
         EditorView.theme({
           "&": {
-            height: "100%"
+            height: "100%",
+            fontSize: "14px"
           },
 
           ".cm-scroller": {
             fontFamily:
               '"JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace',
-            overflow: "auto"
+            overflow: "auto",
+            WebkitOverflowScrolling: "touch"
           },
 
           ".cm-content": {
-            padding: "12px 0"
+            padding: "12px 0",
+            minHeight: "100%",
+            caretColor: "#ffffff"
           },
 
           ".cm-gutters": {
@@ -119,13 +162,11 @@ export class EditorService {
           },
 
           ".cm-activeLine": {
-            backgroundColor:
-              "rgba(255, 255, 255, 0.035)"
+            backgroundColor: "rgba(255, 255, 255, 0.035)"
           },
 
           ".cm-activeLineGutter": {
-            backgroundColor:
-              "rgba(124, 92, 255, 0.12)"
+            backgroundColor: "rgba(124, 92, 255, 0.12)"
           }
         })
       ]
@@ -137,15 +178,20 @@ export class EditorService {
     });
 
     this.updateCursor();
+    this.focus();
   }
 
 
   loadFile(fileName, content) {
     this.currentFile = fileName;
+    this.language = detectLanguage(fileName);
 
     if (!this.view) {
+      this.mount(fileName, content);
       return;
     }
+
+    this.loadingFile = true;
 
     this.view.dispatch({
       changes: {
@@ -153,37 +199,28 @@ export class EditorService {
         to: this.view.state.doc.length,
         insert: content
       },
-
-      // Switching files should not save the old file's
-      // content into the newly selected file.
+      selection: { anchor: 0 },
       userEvent: "select.change"
     });
 
+    this.loadingFile = false;
     this.updateCursor();
     this.focus();
   }
 
 
   getValue() {
-    if (!this.view) {
-      return "";
-    }
-
-    return this.view.state.doc.toString();
+    return this.view?.state.doc.toString() ?? "";
   }
 
 
   focus() {
-    if (this.view) {
-      this.view.focus();
-    }
+    this.view?.focus();
   }
 
 
   updateCursor() {
-    if (!this.view) {
-      return;
-    }
+    if (!this.view) return;
 
     const position =
       this.view.state.selection.main.head;
@@ -196,14 +233,9 @@ export class EditorService {
     const lines =
       textBeforeCursor.split("\n");
 
-    const line = lines.length;
-
-    const column =
-      lines[lines.length - 1].length + 1;
-
     this.onCursorChange?.({
-      line,
-      column
+      line: lines.length,
+      column: lines.at(-1).length + 1
     });
   }
 }
