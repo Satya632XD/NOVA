@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1.0,
+             maximum-scale=1.0,
+             viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#080b10"
+  >
+
+  <title>NOVA IDE</title>
+
+  <link
+    rel="stylesheet"
+    href="/styles.css"
+  >
+</head>
+
+<body>
+
+  <header class="topbar">
+
+    <button
+      class="icon-button"
+      aria-label="Open menu"
+    >
+      ☰
+    </button>
+
+    <div class="brand">
+      <span class="brand-icon">N</span>
+      <span>NOVA</span>
+    </div>
+
+    <div class="topbar-actions">
+
+      <button
+        id="build"
+        class="button secondary"
+      >
+        Build APK
+      </button>
+
+      <button
+        id="run"
+        class="button primary"
+      >
+        ▶ Run
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <main class="workspace">
+
+    <section
+      id="files-view"
+      class="view"
+    >
+
+      <div class="view-header">
+        <div>
+          <span class="eyebrow">
+            PROJECT
+          </span>
+
+          <h1>
+            Explorer
+          </h1>
+        </div>
+
+        <button
+          id="create-file"
+          class="button small"
+        >
+          + File
+        </button>
+      </div>
+
+      <div
+        id="file-list"
+        class="file-list"
+      ></div>
+
+    </section>
+
+
+    <section
+      id="code-view"
+      class="view active"
+    >
+
+      <div class="editor-header">
+
+        <div>
+          <span
+            id="current-file"
+            class="current-file"
+          >
+            No file
+          </span>
+
+          <span
+            id="status"
+            class="status"
+          >
+            Ready
+          </span>
+        </div>
+
+        <span
+          id="cursor-position"
+          class="cursor-position"
+        >
+          Ln 1, Col 1
+        </span>
+
+      </div>
+
+
+      <div
+        id="editor-tabs"
+        class="editor-tabs"
+      ></div>
+
+
+      <div
+        id="editor"
+        class="editor"
+      ></div>
+
+    </section>
+
+
+    <section
+      id="preview-view"
+      class="view preview-screen"
+    >
+
+      <div class="preview-header">
+
+        <div>
+          <span class="eyebrow">
+            LIVE PREVIEW
+          </span>
+
+          <h2>
+            Web Runtime
+          </h2>
+        </div>
+
+        <span class="live-indicator">
+          <span></span>
+          Live
+        </span>
+
+      </div>
+
+
+      <iframe
+        id="preview-frame"
+        title="NOVA live preview"
+        sandbox="allow-scripts"
+      ></iframe>
+
+
+      <div
+        id="preview-console"
+        class="preview-console"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <nav class="bottom-nav">
+
+    <button
+      data-view="files"
+      class="nav-button"
+    >
+      <span>▤</span>
+      <small>Files</small>
+    </button>
+
+    <button
+      data-view="code"
+      class="nav-button active"
+    >
+      <span>⌨</span>
+      <small>Code</small>
+    </button>
+
+    <button
+      data-view="preview"
+      class="nav-button"
+    >
+      <span>▷</span>
+      <small>Preview</small>
+    </button>
+
+  </nav>
+
+
+  <script
+    type="module"
+    src="/app.js"
+  ></script>
+
+</body>
+</html>
