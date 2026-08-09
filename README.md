@@ -1,8 +1,8 @@
-# NOVA IDE — Phase 1B
+# NOVA IDE — Phase 1C Completed
 
 NOVA is a mobile-first, web-native IDE designed for browser-based development and cloud-accelerated Android builds.
 
-## Phase 1B
+## Phase 1C
 
 - Mobile-first dashboard
 - Project file explorer
@@ -20,25 +20,4 @@ NOVA does not require a local terminal, Termux, or Acode for this architecture.
 
 The frontend is deployed by Vercel and the `/api` directory contains serverless endpoints.
 
-## Repository
-
-```text
-nova/
-├── README.md
-├── app.js
-├── index.html
-├── package.json
-├── styles.css
-├── vercel.json
-├── api/
-│   ├── build.js
-│   └── health.js
-├── src/
-│   ├── compiler.js
-│   ├── editor.js
-│   ├── filesystem.js
-│   └── preview.js
-└── .github/
-    └── workflows/
-        └── android-build.yml
-```
+# NOVA IDE — Phase 1D- Terminal upcoming 
