@@ -3,6 +3,7 @@ import { FileSystemService } from "./src/filesystem.js";
 import { PreviewService } from "./src/preview.js";
 import { CompilerService } from "./src/compiler.js";
 import { RuntimeService } from "./src/runtime.js";
+import { BrowserExecutor, TerminalController } from "./src/terminal.js";
 
 const fileSystem =
   new FileSystemService();
@@ -20,7 +21,9 @@ const elements = {
   previewView: document.querySelector("#preview-view"),
   createFile: document.querySelector("#create-file"),
   run: document.querySelector("#run"),
-  build: document.querySelector("#build")
+  build: document.querySelector("#build"),
+  terminalMount: document.querySelector("#terminal-mount"),
+  terminalToggle: document.querySelector("#terminal-toggle")
 };
 
 let activeFile = null;
@@ -133,6 +136,61 @@ const runtime =
       preview.log(type, message);
     }
   });
+
+const terminalExecutor =
+  new BrowserExecutor({
+    fileSystem,
+    preview,
+    runtime,
+    compiler,
+    onViewChange: view => showView(view)
+  });
+
+const terminal =
+  new TerminalController({
+    executor: terminalExecutor,
+    getActiveFile: () => activeFile
+  });
+
+if (elements.terminalMount) {
+  terminal.mount(elements.terminalMount);
+}
+
+if (elements.terminalToggle) {
+  terminal.registerToggleButton(elements.terminalToggle);
+}
+
+// Keep the file explorer and the open editor tab in sync with
+// any filesystem changes made from the terminal (touch, mkdir,
+// rm, cp, mv, or edits made indirectly). This does not create a
+// second source of truth: it just re-reads NOVA's existing
+// FileSystemService after each terminal command.
+function syncAfterTerminalCommand() {
+  renderFiles();
+  renderTabs();
+
+  if (activeFile && fileSystem.exists(activeFile)) {
+    const latest = fileSystem.readFile(activeFile);
+
+    if (editor.view && latest !== editor.getValue()) {
+      editor.loadFile(activeFile, latest);
+    }
+  } else if (activeFile && !fileSystem.exists(activeFile)) {
+    activeFile = null;
+    elements.fileName.textContent = "No file";
+  }
+}
+
+const terminalForm = elements.terminalMount?.querySelector(
+  "[data-terminal-form]"
+);
+
+terminalForm?.addEventListener("submit", () => {
+  // Runs after TerminalController's own submit handler has
+  // executed the command (listeners fire in the order they were
+  // attached), so the filesystem is already up to date here.
+  window.setTimeout(syncAfterTerminalCommand, 0);
+});
 
 function openFile(fileName) {
   activeFile = fileName;
