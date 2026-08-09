@@ -25,6 +25,7 @@ import {
   defaultHighlightStyle
 } from "https://esm.sh/@codemirror/language";
 
+
 function languageForFile(fileName) {
   if (fileName.endsWith(".html")) {
     return html();
@@ -36,6 +37,7 @@ function languageForFile(fileName) {
 
   return javascript();
 }
+
 
 export class EditorService {
   constructor({
@@ -50,6 +52,7 @@ export class EditorService {
     this.view = null;
     this.currentFile = null;
   }
+
 
   mount(fileName, content) {
     this.currentFile = fileName;
@@ -136,6 +139,7 @@ export class EditorService {
     this.updateCursor();
   }
 
+
   loadFile(fileName, content) {
     this.currentFile = fileName;
 
@@ -154,6 +158,7 @@ export class EditorService {
     this.updateCursor();
   }
 
+
   getValue() {
     if (!this.view) {
       return "";
@@ -162,11 +167,13 @@ export class EditorService {
     return this.view.state.doc.toString();
   }
 
+
   focus() {
     if (this.view) {
       this.view.focus();
     }
   }
+
 
   updateCursor() {
     if (!this.view) {
@@ -182,8 +189,7 @@ export class EditorService {
         .slice(0, position);
 
     const lines =
-      textBeforeCursor.split("
-");
+      textBeforeCursor.split("\n");
 
     const line = lines.length;
 
