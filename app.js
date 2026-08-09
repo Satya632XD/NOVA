@@ -2,6 +2,7 @@ import { EditorService } from "./src/editor.js";
 import { FileSystemService } from "./src/filesystem.js";
 import { PreviewService } from "./src/preview.js";
 import { CompilerService } from "./src/compiler.js";
+import { RuntimeService } from "./src/runtime.js";
 
 const fileSystem =
   new FileSystemService();
@@ -125,6 +126,14 @@ const compiler =
     onStatus: setStatus
   });
 
+const runtime =
+  new RuntimeService({
+    onStatus: setStatus,
+    onOutput(type, message) {
+      preview.log(type, message);
+    }
+  });
+
 function openFile(fileName) {
   activeFile = fileName;
 
@@ -216,12 +225,34 @@ elements.createFile?.addEventListener(
 
 elements.run?.addEventListener(
   "click",
-  () => {
-    preview.render(
-      fileSystem.project.files
-    );
+  async () => {
+    if (!activeFile) {
+      setStatus("Open a file first.");
+      return;
+    }
 
-    showView("preview");
+    preview.clearConsole();
+
+    try {
+      const result =
+        await runtime.run(
+          activeFile,
+          fileSystem.project.files
+        );
+
+      if (result.type === "preview") {
+        preview.render(
+          fileSystem.project.files
+        );
+        showView("preview");
+      } else {
+        showView("preview");
+      }
+    } catch (error) {
+      preview.log("error", error.message);
+      setStatus("Runtime error");
+      showView("preview");
+    }
   }
 );
 
@@ -273,5 +304,3 @@ if (firstFile) {
 
 showView("code");
 setStatus("Ready");
-
-
