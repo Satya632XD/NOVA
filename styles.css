@@ -422,3 +422,249 @@ h2 {
     margin: 0 auto;
   }
 }
+
+/* ---------------------------------------------------------------
+   Terminal
+   --------------------------------------------------------------- */
+
+.terminal-toggle-button {
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    monospace;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.terminal-toggle-button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.terminal-panel {
+  position: fixed;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 200;
+
+  display: flex;
+  flex-direction: column;
+
+  height: min(60vh, 420px);
+
+  background: #05070b;
+  border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.45);
+
+  transform: translateY(100%);
+  opacity: 0;
+
+  transition:
+    transform 0.22s ease,
+    opacity 0.22s ease;
+
+  pointer-events: none;
+}
+
+.terminal-panel.open {
+  transform: translateY(0);
+  opacity: 1;
+
+  pointer-events: auto;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 44px;
+
+  padding: 0 12px;
+
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+
+  flex: 0 0 auto;
+}
+
+.terminal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.terminal-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--success);
+  box-shadow: 0 0 10px var(--success);
+}
+
+.terminal-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-icon-button {
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  color: var(--muted);
+  font-size: 14px;
+
+  touch-action: manipulation;
+}
+
+.terminal-icon-button:hover,
+.terminal-icon-button:active {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.terminal-output {
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  padding: 10px 12px;
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.terminal-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  color: var(--text);
+}
+
+.terminal-line.echo {
+  color: var(--muted);
+}
+
+.terminal-line.error {
+  color: var(--danger);
+}
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex: 0 0 auto;
+
+  padding:
+    8px 12px
+    calc(8px + env(safe-area-inset-bottom))
+    12px;
+
+  background: #080b10;
+  border-top: 1px solid var(--border);
+}
+
+.terminal-prompt {
+  flex: 0 0 auto;
+
+  color: var(--accent);
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    monospace;
+
+  font-size: 12.5px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.terminal-input {
+  flex: 1;
+  min-width: 0;
+
+  background: transparent;
+  border: 0;
+  outline: none;
+
+  color: var(--text);
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 13px;
+}
+
+.terminal-input::placeholder {
+  color: var(--muted);
+}
+
+/* When the terminal is open, keep it above the bottom nav but
+   don't let the rest of the app shift or resize — it's an
+   overlay drawer, not a new layout column. */
+body.terminal-open .bottom-nav {
+  z-index: 90;
+}
+
+@media (min-width: 800px) {
+  .terminal-panel {
+    max-width: 1200px;
+    left: 50%;
+
+    transform: translate(-50%, 100%);
+  }
+
+  .terminal-panel.open {
+    transform: translate(-50%, 0);
+  }
+
+  .terminal-panel {
+    height: min(50vh, 480px);
+  }
+}
+
+@media (orientation: landscape) and (max-width: 900px) {
+  .terminal-panel {
+    height: min(70vh, 320px);
+  }
+}
+
+
+
