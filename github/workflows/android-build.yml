@@ -1,0 +1,41 @@
+name: NOVA Android Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: "NOVA build ID"
+        required: true
+        type: string
+
+      project_ref:
+        description: "Project reference"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build NOVA
+        run: npm run build
+
+      - name: Report build
+        run: |
+          echo "NOVA build ID: ${{ inputs.build_id }}"
+          echo "NOVA Android compiler pipeline initialized."
