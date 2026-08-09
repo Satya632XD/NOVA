@@ -135,10 +135,19 @@ function openFile(fileName) {
   elements.fileName.textContent =
     fileName;
 
-  editor.loadFile(
-    fileName,
-    fileSystem.readFile(fileName)
-  );
+  const content = fileSystem.readFile(fileName);
+
+  if (!editor.view) {
+    editor.mount(
+      fileName,
+      content
+    );
+  } else {
+    editor.loadFile(
+      fileName,
+      content
+    );
+  }
 
   renderFiles();
   renderTabs();
@@ -264,3 +273,5 @@ if (firstFile) {
 
 showView("code");
 setStatus("Ready");
+
+
